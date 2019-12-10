@@ -63,7 +63,7 @@ elif task == "Find Best Pokemon for combat":
 
     st.write(list(sweet_spot.values))
 
-    if len(set(team["Type 1"]).union(set(team["Type 1"])).intersection(set(sweet_spot))) > 0:
+    if len(set(team["Type 1"]).union(set(team["Type 2"])).intersection(set(sweet_spot))) > 0:
         chosen = set()
         preference = []
         for typ in sweet_spot:
