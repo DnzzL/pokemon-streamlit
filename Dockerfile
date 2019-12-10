@@ -16,4 +16,4 @@ COPY . /src
 RUN poetry config settings.virtualenvs.create false
 RUN poetry install --no-interaction --no-dev
 
-CMD poetry run streamlit run app.py
+CMD poetry run streamlit run --server.enableCORS false app.py
