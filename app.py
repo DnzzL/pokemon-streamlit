@@ -6,7 +6,7 @@ st.title('Pokemon')
 
 @st.cache
 def load_data():
-    return pd.read_csv("Pokemon.csv"), pd.read_csv("chart.csv")
+    return pd.read_csv("data/Pokemon_Gen_1-8.csv"), pd.read_csv("data/chart.csv")
 
 with st.spinner('Loading data...'):
     pokemons, types = load_data()
@@ -39,6 +39,10 @@ elif task == "Find Best Pokemon for combat":
     if len(selected) > 6:
         st.error("your team cannot exceed 6")
     team = pokemons[pokemons.Name.isin(selected)]
+    team_types = list(filter(lambda x: x!= "Nan", list(set(team["Type 1"].values).union(set(team["Type 2"].values)))))
+    st.write(f"Your team has types...")
+    st.write(team_types)
+
     opponent = st.selectbox(
         'Who are you fighting against ?',
         pokemons.Name
@@ -48,6 +52,7 @@ elif task == "Find Best Pokemon for combat":
     st.write(f"{opponent} is of type {opponent_type_1.values[0]} and {opponent_type_2.values[0]}. His weaknesses are...")
     opponent_weaknesses_type_1 = types[opponent_type_1].values
     opponent_weaknesses_type_2 = types[opponent_type_2].values
+
     weaknesses = pd.DataFrame(data={"Attacking Type": types.Attacking, "Weakness": list(map(lambda x,y: float(x*y), opponent_weaknesses_type_1, opponent_weaknesses_type_2))})
     sweet_spot = weaknesses.sort_values(by="Weakness", ascending=False)[weaknesses.Weakness > 1]["Attacking Type"]
 
@@ -57,7 +62,7 @@ elif task == "Find Best Pokemon for combat":
         chosen = set()
         preference = []
         for typ in sweet_spot:
-            for row in team[(team["Type 1"] == typ) | (team["Type 2"] == typ)].sort_values(by="Attack", ascending=False).itertuples():
+            for row in team[(team["Type 1"] == typ) | (team["Type 2"] == typ)].sort_values(by="Total", ascending=False).itertuples():
                 if row.Name in chosen:
                     continue
                 chosen.add(row.Name)
