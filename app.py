@@ -39,7 +39,7 @@ elif task == "Find Best Pokemon for combat":
     if len(selected) > 6:
         st.error("your team cannot exceed 6")
     team = pokemons[pokemons.Name.isin(selected)]
-    team_types = list(filter(lambda x: x!= "Nan", list(set(team["Type 1"].values).union(set(team["Type 2"].values)))))
+    team_types = list(set(team["Type 1"].values).union(set(team["Type 2"].dropna().values)))
     st.write(f"Your team has types...")
     st.write(team_types)
 
@@ -48,12 +48,17 @@ elif task == "Find Best Pokemon for combat":
         pokemons.Name
     )
     opponent_type_1 = pokemons[pokemons.Name == opponent]["Type 1"]
-    opponent_type_2 = pokemons[pokemons.Name == opponent]["Type 2"]
-    st.write(f"{opponent} is of type {opponent_type_1.values[0]} and {opponent_type_2.values[0]}. His weaknesses are...")
     opponent_weaknesses_type_1 = types[opponent_type_1].values
-    opponent_weaknesses_type_2 = types[opponent_type_2].values
+    opponent_type_2 = pokemons[pokemons.Name == opponent]["Type 2"]
+    if len(opponent_type_2.dropna()) > 0:
+        st.write(f"{opponent} is of type {opponent_type_1.values[0]} and {opponent_type_2.values[0]}. His weaknesses are...")
+        opponent_weaknesses_type_2 = types[opponent_type_2].values
+        weaknesses_power = list(map(lambda x,y: float(x*y), opponent_weaknesses_type_1, opponent_weaknesses_type_2))
+    else:
+        st.write(f"{opponent} is of type {opponent_type_1.values[0]}. His weaknesses are...")
+        weaknesses_power = list(opponent_weaknesses_type_1)
 
-    weaknesses = pd.DataFrame(data={"Attacking Type": types.Attacking, "Weakness": list(map(lambda x,y: float(x*y), opponent_weaknesses_type_1, opponent_weaknesses_type_2))})
+    weaknesses = pd.DataFrame(data={"Attacking Type": types.Attacking, "Weakness": weaknesses_power})
     sweet_spot = weaknesses.sort_values(by="Weakness", ascending=False)[weaknesses.Weakness > 1]["Attacking Type"]
 
     st.write(list(sweet_spot.values))
