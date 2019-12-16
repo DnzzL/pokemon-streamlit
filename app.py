@@ -14,7 +14,7 @@ with st.spinner('Loading data...'):
 
 placeholder = "Select task..."
 tasks = ["Visualize", "Find Best Pokemon for combat"]
-task = st.sidebar.selectbox(f"Tasks ({len(tasks)})", [placeholder] + tasks)
+task = st.selectbox(f"Tasks ({len(tasks)})", [placeholder] + tasks)
 
 DEFAULT_PLOTLY_COLORS=['rgb(31, 119, 180)', 'rgb(255, 127, 14)',
                        'rgb(44, 160, 44)', 'rgb(214, 39, 40)',
@@ -39,6 +39,7 @@ elif task == "Find Best Pokemon for combat":
     if len(selected) > 6:
         st.error("your team cannot exceed 6")
     team = pokemons[pokemons.Name.isin(selected)]
+    st.image([f'images/{id_}.png' for id_ in team["#"].values])
     team_types = list(set(team["Type 1"].values).union(set(team["Type 2"].dropna().values)))
     st.write(f"Your team has types...")
     st.write(team_types)
@@ -47,6 +48,7 @@ elif task == "Find Best Pokemon for combat":
         'Who are you fighting against ?',
         pokemons.Name
     )
+    st.image([f'images/{pokemons[pokemons.Name == opponent]["#"].values[0]}.png'])
     opponent_type_1 = pokemons[pokemons.Name == opponent]["Type 1"]
     opponent_weaknesses_type_1 = types[opponent_type_1].values
     opponent_type_2 = pokemons[pokemons.Name == opponent]["Type 2"]
